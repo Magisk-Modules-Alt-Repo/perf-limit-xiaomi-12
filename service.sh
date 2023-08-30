@@ -50,10 +50,13 @@ if [ ! -f "${CONFIG_PATH}" ] ; then
     echo "# 1 - Very hot. Max performance with minimum temp decrease. S:1845,T(C):64" >> ${CONFIG_PATH}
     echo "# 2 - Quite hot. Good performance, some temp decrease. S:1654,T(C):56" >> ${CONFIG_PATH}
     echo "# 3 - Same as 3 but with slightly lower CPU frequencies. I recommnd #2 and #3 modern for gaming. S:1648,T(C):55.5" >> ${CONFIG_PATH}
-    echo "# 4 - [Recommended] Somewhat hot. Ok performance, noticeable temp decrease. S:1435,T(C):53" >> ${CONFIG_PATH}
-    echo "# 5 - Not hot. Reduced performance, significant temp decrease. S:1184,T(C):45 " >> ${CONFIG_PATH}
+    echo "# 4 - Somewhat hot. Ok performance, noticeable temp decrease. S:1435,T(C):53" >> ${CONFIG_PATH}
+    echo "# 5 - [Recommended] Not hot. Reduced performance, significant temp decrease. S:1184,T(C):45" >> ${CONFIG_PATH}
+    echo "6 and 7 are similar with 5 but with lower CPU frequencies" >> ${CONFIG_PATH}
+    echo "# 6 - Not hot. Reduced performance" >> ${CONFIG_PATH}
+    echo "# 6 - Not hot. Reduced performance" >> ${CONFIG_PATH}
     echo "" >> ${CONFIG_PATH}
-    echo "cpu_gpu_limit=4" >> ${CONFIG_PATH}
+    echo "cpu_gpu_limit=5" >> ${CONFIG_PATH}
     echo "" >> ${CONFIG_PATH}
 else
     echo "perf-limit: using existing config ${CONFIG_PATH}" >> ${LOG_FILE}
@@ -105,6 +108,14 @@ while true; do
         GPU_POWER_LIMIT=8
         POLICY_4_MAX_FREQ=1766400
         POLICY_7_MAX_FREQ=1728000
+    elif [ "${LIMIT_PROFILE}" == "6" ] ; then
+        GPU_POWER_LIMIT=9
+        POLICY_4_MAX_FREQ=1440000
+        POLICY_7_MAX_FREQ=1497600
+    elif [ "${LIMIT_PROFILE}" == "7" ] ; then
+        GPU_POWER_LIMIT=9
+        POLICY_4_MAX_FREQ=1209600
+        POLICY_7_MAX_FREQ=1286400
     else
         GPU_POWER_LIMIT=$GPU_POWER_LIMIT_ORIG
         POLICY_4_MAX_FREQ=$POLICY_4_MAX_FREQ_ORIG
@@ -130,5 +141,5 @@ while true; do
         echo "${POLICY_7_MAX_FREQ}" > ${POLICY_7_PATH}
     fi
 
-    sleep 15
+    sleep 20
 done
