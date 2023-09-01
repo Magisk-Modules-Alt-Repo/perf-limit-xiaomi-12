@@ -6,28 +6,18 @@ POLICY_0_PATH=/sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq
 POLICY_4_PATH=/sys/devices/system/cpu/cpufreq/policy4/scaling_max_freq
 POLICY_7_PATH=/sys/devices/system/cpu/cpufreq/policy7/scaling_max_freq
 
-# GPU
-if [ ! -f "${GPU_PATH}" ] ; then
-    ui_print "perf-limit: won't work ${GPU_PATH} not found. Exiting."
-    exit
-fi;
+check_if_file_exist() {
+    if [ ! -f "${1}" ]; then
+        abort "perf-limit: won't work ${1} not found. Exiting."
+    fi
+}
 
-# POLICY_0
-if [ ! -f "${POLICY_0_PATH}" ] ; then
-    ui_print "perf-limit: won't work. ${POLICY_0_PATH} not found. Exiting."
-    exit
-fi;
-
-# POLICY_4
-if [ ! -f "${POLICY_4_PATH}" ] ; then
-    ui_print "perf-limit: won't work. ${POLICY_4_PATH} not found. Exiting."
-    exit
-fi;
-
-# POLICY_7
-if [ ! -f "${POLICY_7_PATH}" ] ; then
-    ui_print "perf-limit: won't work ${POLICY_7_PATH} not found. Exiting."
-    exit
-fi;
+for file in \
+    ${GPU_PATH} \
+    ${POLICY_0_PATH} \
+    ${POLICY_4_PATH} \
+    ${POLICY_7_PATH}; do
+    check_if_file_exist "$file"
+done
 
 ui_print "perf-limit: all looks good! Please reboot the device."

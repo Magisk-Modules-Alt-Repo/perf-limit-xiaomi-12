@@ -4,6 +4,8 @@
 
 Tested on Xiaomi 12 Pro Global, Android 13, Xiaomi.eu 14.0.14.0
 
+Confirmed to be working on Xiaomi 12, Xiaomi 12 Pro.
+
 ## Setup
 
 Download and install the module. See [Releases](https://github.com/mgrybyk/perf-limit-magisk/releases).
