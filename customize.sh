@@ -1,4 +1,4 @@
-ui_print "perf-limit: GPU power and CPU frequencies limit for Xiaomi 12 Pro."
+ui_print "perf-limit: GPU power and CPU frequencies limit for Xiaomi 12 (Pro)."
 ui_print "perf-limit: running checks..."
 
 GPU_PATH=/sys/class/kgsl/kgsl-3d0/max_pwrlevel
