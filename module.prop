@@ -1,7 +1,7 @@
 id=perf-limit-xiaomi-12
 name=Performance limit for Xiaomi 12 Pro
-version=1.2
+version=v1.2
 versionCode=12
 author=mgrybyk
-description=Limit CPU and GPU performance to selected level on Xiaomi 12 Pro.
+description=Limit CPU and GPU performance to desired level on Xiaomi devices with Qualcomm Gen1 CPU.
 updateJson=
