@@ -2,11 +2,21 @@
 
 > Limit CPU and GPU performance to desired level on Xiaomi devices with Qualcomm Gen 1 CPU
 
+Tested on Xiaomi 12 Pro Global, Android 13, Xiaomi.eu 14.0.14.0
+
 ## Setup
 
 Download and install the module. See [Releases](https://github.com/mgrybyk/perf-limit-magisk/releases).
 
 ## Configuration
+
+Config file location: `/sdcard/.perf-limit-magisk/config.prop`
+
+Note: `.perf-limit-magisk` is a hidden folder.
+
+No need to reboot the devices after making changes to the config!
+Check magisk logs after making updating the config file. 
+Your changes will be reflected within 20 seconds.
 
 ### cpu_gpu_limit
 
@@ -23,7 +33,7 @@ Download and install the module. See [Releases](https://github.com/mgrybyk/perf-
 
 Example: `cpu_gpu_limit=5`
 
-### max_pwrlevel
+### Override max_pwrlevel
 
 `max_pwrlevel`
 
@@ -32,7 +42,7 @@ Allow manually override CPU frequencies and GPU power limit.
 
 Example: `cpu_gpu_limit=7`
 
-### policy0_scaling_max_freq
+### Override policy0_scaling_max_freq
 
 `policy0_scaling_max_freq`
 
@@ -40,7 +50,7 @@ CPUs 1-4. See `/sys/devices/system/cpu/cpufreq/policy0/scaling_available_frequen
 
 Example: `policy0_scaling_max_freq=960000`
 
-### policy4_scaling_max_freq
+### Override policy4_scaling_max_freq
 
 `policy4_scaling_max_freq`
 
@@ -48,10 +58,28 @@ CPUs 5-7. See `/sys/devices/system/cpu/cpufreq/policy4/scaling_available_frequen
 
 Example: `policy4_scaling_max_freq=1440000`
 
-### policy7_scaling_max_freq
+### Override policy7_scaling_max_freq
 
 `policy7_scaling_max_freq`
 
 CPU 8. See `/sys/devices/system/cpu/cpufreq/policy7/scaling_available_frequencies` for available values.
 
 Example: `policy7_scaling_max_freq=1958400`
+
+## Logs
+
+Example log output:
+
+```
+perf-limit: start, waiting for /sdcard
+perf-limit: Writing default config to ./config.prop
+perf-limit: cpu_gpu_limit=5
+perf-limit: current kgsl gpu value is '0'
+perf-limit: current policy 0 value is '1728000'
+...
+perf-limit: perf-limit service is running...
+perf-limit: applying new values:
+perf-limit: updating kgsl gpu to '8'
+perf-limit: updating policy 4 to '1766400'
+...
+```
