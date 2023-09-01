@@ -2,8 +2,8 @@ name: Main
 
 on:
   push:
-    # tags:
-    #   - "v*.*"
+    tags:
+      - "v*.*"
 
 permissions:
   contents: write
@@ -15,9 +15,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - run: ./zip.sh
-      - run: ls -al
-    #   - name: Release
-    #     uses: softprops/action-gh-release@v1
-    #     with:
-    #       files: |
-    #         perf-limit-xiaomi-12-*.zip
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            perf-limit-xiaomi-12-*.zip
