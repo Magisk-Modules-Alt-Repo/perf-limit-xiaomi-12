@@ -7,4 +7,4 @@ sed -e "s/versionCode=.*/versionCode=${versionCode}/" module.prop > module.prop.
 
 # zip
 rm -f perf-limit-xiaomi-12*.zip
-zip -vr perf-limit-xiaomi-12-$version.zip . -x "*.DS_Store" -x "*.zip" -x ".git/*" -x ".gitignore" -x ".github" -x "LICENSE" -x "zip.sh" -x "test.sh"
+zip -vr perf-limit-xiaomi-12-$version.zip . -x "*.DS_Store" -x "*.zip" -x ".git/*" -x ".gitignore" -x ".github" -x "README.md" -x "LICENSE" -x "zip.sh" -x "test.sh"
