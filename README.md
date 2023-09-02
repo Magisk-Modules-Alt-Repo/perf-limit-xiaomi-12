@@ -31,12 +31,12 @@ Your changes will be reflected within 20 seconds.
 `cpu_gpu_limit`
 
 - `0` - Disable limit completely
-- `1` - Low GPU limit. CPU 1075200/1881600/1728000 (device is a bit less hot)
-- `2` - Low GPU limit. CPU 1075200/1324800/1171200 (same as 1 but with lower CPU freqs)
-- `3` - Average GPU limit. CPU 1075200/1881600/1728000 (device is less hot)
-- `4` - Average GPU limit. CPU 1075200/1324800/1171200 (same as 3 but with lower CPU freqs)
-- `5` - High GPU limit. CPU 1075200/1881600/1728000 (device is not hot)
-- `6` - High GPU limit. CPU 1075200/1881600/1728000 (same as 5 but with lower CPU freqs)
+- `1` - Low GPU limit (6). CPU 1075200/1881600/1728000 (device is a bit less hot)
+- `2` - Low GPU limit (6). CPU 1075200/1324800/1171200 (same as 1 but with lower CPU freqs)
+- `3` - Average GPU limit (7). CPU 1075200/1881600/1728000 (device is less hot)
+- `4` - Average GPU limit (7). CPU 1075200/1324800/1171200 (same as 3 but with lower CPU freqs)
+- `5` - High GPU limit (8). CPU 1075200/1881600/1728000 (device is not hot)
+- `6` - High GPU limit (8). CPU 1075200/1881600/1728000 (same as 5 but with lower CPU freqs)
 
 Default: `cpu_gpu_limit=3`
 
