@@ -13,7 +13,7 @@ LOG_FILE=/cache/magisk.log
 echo "perf-limit: start, waiting for /sdcard" >> ${LOG_FILE}
 
 while [ ! -d /sdcard ]; do
-    sleep 5
+    sleep 10
 done
 
 # GPU
@@ -55,9 +55,15 @@ if [ -f "${CONFIG_PATH}" ] ; then
     OVERRIDE_POLICY_0_SCALING_MAX_FREQ=$(grep "policy0_scaling_max_freq" ${CONFIG_PATH} | cut -d "=" -f2)
     OVERRIDE_POLICY_4_SCALING_MAX_FREQ=$(grep "policy4_scaling_max_freq" ${CONFIG_PATH} | cut -d "=" -f2)
     OVERRIDE_POLICY_7_SCALING_MAX_FREQ=$(grep "policy7_scaling_max_freq" ${CONFIG_PATH} | cut -d "=" -f2)
+    ENABLE_LOG=$(grep "enable_log" ${CONFIG_PATH} | cut -d "=" -f2)
     echo "perf-limit: using existing config ${CONFIG_PATH}" >> ${LOG_FILE}
+
+    # profile 7 removed in v2! Left it for compatibility with v1
+    if [ "${LIMIT_PROFILE}" == "7" ] ; then
+        LIMIT_PROFILE=4
+    fi
 else
-    LIMIT_PROFILE=5;
+    LIMIT_PROFILE=4;
     echo "perf-limit: Writing default config to $CONFIG_PATH" >> ${LOG_FILE}
 fi
 write_config()
@@ -66,15 +72,13 @@ write_config()
 
     echo "# no whitespaces allowed! Do not change anything else including comments!" > ${CONFIG_PATH}
     echo "" >> ${CONFIG_PATH}
-    echo "# 0 - Disable limit completely. S:1860,T(C):67+" >> ${CONFIG_PATH}
-    echo "# 1 - Very hot. Max performance with minimum temp decrease. S:1845,T(C):64" >> ${CONFIG_PATH}
-    echo "# 2 - Quite hot. Good performance, some temp decrease. S:1654,T(C):56" >> ${CONFIG_PATH}
-    echo "# 3 - Same as 3 but with slightly lower CPU frequencies. I recommnd #2 and #3 modern for gaming. S:1648,T(C):55.5" >> ${CONFIG_PATH}
-    echo "# 4 - Somewhat hot. Ok performance, noticeable temp decrease. S:1435,T(C):53" >> ${CONFIG_PATH}
-    echo "# 5 - [Recommended] Not hot. Reduced performance, significant temp decrease. S:1184,T(C):45" >> ${CONFIG_PATH}
-    echo "6 and 7 are similar with 5 but with lower CPU frequencies" >> ${CONFIG_PATH}
-    echo "# 6 - Not hot. Reduced performance" >> ${CONFIG_PATH}
-    echo "# 7 - Not hot. Reduced performance" >> ${CONFIG_PATH}
+    echo "# 0 - Disable limit completely" >> ${CONFIG_PATH}
+    echo "# 1 - Low GPU limit. CPU 1075200/1881600/1728000 (device is a bit less hot)" >> ${CONFIG_PATH}
+    echo "# 2 - Low GPU limit. CPU 1075200/1324800/1171200 (same as 1 but with lower CPU freqs)" >> ${CONFIG_PATH}
+    echo "# 3 - Average GPU limit. CPU 1075200/1881600/1728000 [Recommended] (device is less hot)" >> ${CONFIG_PATH}
+    echo "# 4 - Average GPU limit. CPU 1075200/1324800/1171200 [Recommended] (same as 3 but with lower CPU freqs)" >> ${CONFIG_PATH}
+    echo "# 5 - High GPU limit. CPU 1075200/1881600/1728000 (device is not hot)" >> ${CONFIG_PATH}
+    echo "# 6 - High GPU limit. CPU 1075200/1881600/1728000 (same as 5 but with lower CPU freqs)" >> ${CONFIG_PATH}
     echo "" >> ${CONFIG_PATH}
     echo "cpu_gpu_limit=${LIMIT_PROFILE}" >> ${CONFIG_PATH}
     echo "" >> ${CONFIG_PATH}
@@ -87,6 +91,9 @@ write_config()
     echo "policy4_scaling_max_freq=${OVERRIDE_POLICY_4_SCALING_MAX_FREQ}" >> ${CONFIG_PATH}
     echo "# CPU 8. See /sys/devices/system/cpu/cpufreq/policy7/scaling_available_frequencies" >> ${CONFIG_PATH}
     echo "policy7_scaling_max_freq=${OVERRIDE_POLICY_7_SCALING_MAX_FREQ}" >> ${CONFIG_PATH}
+    echo "" >> ${CONFIG_PATH}
+    echo "# Set to true to enable verbose logging" >> ${CONFIG_PATH}
+    echo "enable_log=" >> ${CONFIG_PATH}
     echo "" >> ${CONFIG_PATH}
 }
 write_config;
@@ -135,40 +142,35 @@ while true; do
   
     # choosing new values based on config
     if [ "${LIMIT_PROFILE}" == "1" ] ; then
-        GPU_POWER_LIMIT=5
-        POLICY_0_MAX_FREQ=$POLICY_0_MAX_FREQ_ORIG
-        POLICY_4_MAX_FREQ=2112000
-        POLICY_7_MAX_FREQ=2054400
+        GPU_POWER_LIMIT=6
+        POLICY_0_MAX_FREQ=1075200
+        POLICY_4_MAX_FREQ=1881600
+        POLICY_7_MAX_FREQ=1728000
     elif [ "${LIMIT_PROFILE}" == "2" ] ; then
         GPU_POWER_LIMIT=6
-        POLICY_0_MAX_FREQ=$POLICY_0_MAX_FREQ_ORIG
-        POLICY_4_MAX_FREQ=1996800
-        POLICY_7_MAX_FREQ=1958400
+        POLICY_0_MAX_FREQ=1075200
+        POLICY_4_MAX_FREQ=1324800
+        POLICY_7_MAX_FREQ=1171200
     elif [ "${LIMIT_PROFILE}" == "3" ] ; then
-        GPU_POWER_LIMIT=6
-        POLICY_0_MAX_FREQ=$POLICY_0_MAX_FREQ_ORIG
+        GPU_POWER_LIMIT=7
+        POLICY_0_MAX_FREQ=1075200
         POLICY_4_MAX_FREQ=1881600
-        POLICY_7_MAX_FREQ=1843200
+        POLICY_7_MAX_FREQ=1728000
     elif [ "${LIMIT_PROFILE}" == "4" ] ; then
         GPU_POWER_LIMIT=7
-        POLICY_0_MAX_FREQ=$POLICY_0_MAX_FREQ_ORIG
-        POLICY_4_MAX_FREQ=1881600
-        POLICY_7_MAX_FREQ=1843200
+        POLICY_0_MAX_FREQ=1075200
+        POLICY_4_MAX_FREQ=1324800
+        POLICY_7_MAX_FREQ=1171200
     elif [ "${LIMIT_PROFILE}" == "5" ] ; then
         GPU_POWER_LIMIT=8
-        POLICY_0_MAX_FREQ=$POLICY_0_MAX_FREQ_ORIG
-        POLICY_4_MAX_FREQ=1766400
+        POLICY_0_MAX_FREQ=1075200
+        POLICY_4_MAX_FREQ=1881600
         POLICY_7_MAX_FREQ=1728000
     elif [ "${LIMIT_PROFILE}" == "6" ] ; then
         GPU_POWER_LIMIT=8
-        POLICY_0_MAX_FREQ=$POLICY_0_MAX_FREQ_ORIG
-        POLICY_4_MAX_FREQ=1440000
-        POLICY_7_MAX_FREQ=1497600
-    elif [ "${LIMIT_PROFILE}" == "7" ] ; then
-        GPU_POWER_LIMIT=8
-        POLICY_0_MAX_FREQ=$POLICY_0_MAX_FREQ_ORIG
+        POLICY_0_MAX_FREQ=1075200
         POLICY_4_MAX_FREQ=1324800
-        POLICY_7_MAX_FREQ=1401600
+        POLICY_7_MAX_FREQ=1171200
     else
         GPU_POWER_LIMIT=$GPU_POWER_LIMIT_ORIG
         POLICY_0_MAX_FREQ=$POLICY_0_MAX_FREQ_ORIG
@@ -190,27 +192,36 @@ while true; do
     fi
 
     if [ "${LIMIT_PROFILE_PREV}" != "${LIMIT_PROFILE}" ] ; then
-        LIMIT_PROFILE_PREV="${LIMIT_PROFILE}"
         echo "perf-limit: applying new values:" >> ${LOG_FILE}
     fi
 
     # writing new values if needed
     if [ "${GPU_POWER_LIMIT_TMP}" != "${GPU_POWER_LIMIT}" ] ; then
-        echo "perf-limit: updating kgsl gpu to '${GPU_POWER_LIMIT}'" >> ${LOG_FILE}
+        if [ "${ENABLE_LOG}" == "true" ] || [ "${LIMIT_PROFILE_PREV}" != "${LIMIT_PROFILE}" ] || [ -n "${OVERRIDE_GPU_POWER_LIMIT}" ] ; then
+            echo "perf-limit: updating kgsl gpu from '${GPU_POWER_LIMIT_TMP}' to '${GPU_POWER_LIMIT}'" >> ${LOG_FILE}
+        fi
         echo "${GPU_POWER_LIMIT}" > ${GPU_PATH}
     fi
     if [ "${POLICY_0_MAX_FREQ_TMP}" != "${POLICY_0_MAX_FREQ}" ] ; then
-        echo "perf-limit: updating policy 0 to '${POLICY_0_MAX_FREQ}'" >> ${LOG_FILE}
+        if [ "${ENABLE_LOG}" == "true" ] || [ "${LIMIT_PROFILE_PREV}" != "${LIMIT_PROFILE}" ] || [ -n "${OVERRIDE_POLICY_0_SCALING_MAX_FREQ}" ] ; then
+            echo "perf-limit: updating policy 0 from '${POLICY_0_MAX_FREQ_TMP}' to '${POLICY_0_MAX_FREQ}'" >> ${LOG_FILE}
+        fi
         echo "${POLICY_0_MAX_FREQ}" > ${POLICY_0_PATH}
     fi
     if [ "${POLICY_4_MAX_FREQ_TMP}" != "${POLICY_4_MAX_FREQ}" ] ; then
-        echo "perf-limit: updating policy 4 to '${POLICY_4_MAX_FREQ}'" >> ${LOG_FILE}
+        if [ "${ENABLE_LOG}" == "true" ] || [ "${LIMIT_PROFILE_PREV}" != "${LIMIT_PROFILE}" ] || [ -n "${OVERRIDE_POLICY_4_SCALING_MAX_FREQ}" ] ; then
+            echo "perf-limit: updating policy 4 from '${POLICY_4_MAX_FREQ_TMP}' to '${POLICY_4_MAX_FREQ}'" >> ${LOG_FILE}
+        fi
         echo "${POLICY_4_MAX_FREQ}" > ${POLICY_4_PATH}
     fi
     if [ "${POLICY_7_MAX_FREQ_TMP}" != "${POLICY_7_MAX_FREQ}" ] ; then
-        echo "perf-limit: updating policy 7 to '${POLICY_7_MAX_FREQ}'" >> ${LOG_FILE}
+        if [ "${ENABLE_LOG}" == "true" ] || [ "${LIMIT_PROFILE_PREV}" != "${LIMIT_PROFILE}" ] || [ -n "${OVERRIDE_POLICY_7_SCALING_MAX_FREQ}" ] ; then
+            echo "perf-limit: updating policy 7 from '${POLICY_7_MAX_FREQ_TMP}' to '${POLICY_7_MAX_FREQ}'" >> ${LOG_FILE}
+        fi
         echo "${POLICY_7_MAX_FREQ}" > ${POLICY_7_PATH}
     fi
+    
+    LIMIT_PROFILE_PREV="${LIMIT_PROFILE}"
 
     sleep 20
 done
