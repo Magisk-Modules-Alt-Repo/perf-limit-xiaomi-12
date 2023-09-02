@@ -60,10 +60,10 @@ if [ -f "${CONFIG_PATH}" ] ; then
 
     # profile 7 removed in v2! Left it for compatibility with v1
     if [ "${LIMIT_PROFILE}" == "7" ] ; then
-        LIMIT_PROFILE=4
+        LIMIT_PROFILE=3
     fi
 else
-    LIMIT_PROFILE=4;
+    LIMIT_PROFILE=3;
     echo "perf-limit: Writing default config to $CONFIG_PATH" >> ${LOG_FILE}
 fi
 write_config()

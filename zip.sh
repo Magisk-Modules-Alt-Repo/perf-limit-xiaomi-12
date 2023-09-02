@@ -1,5 +1,5 @@
-version=v2.0
-versionCode=20
+version=v2.1
+versionCode=21
 
 # module.prop
 sed -e "s/version=.*/version=${version}/" module.prop > module.prop.tmp && mv module.prop.tmp module.prop

@@ -38,13 +38,13 @@ Your changes will be reflected within 20 seconds.
 - `5` - High GPU limit. CPU 1075200/1881600/1728000 (device is not hot)
 - `6` - High GPU limit. CPU 1075200/1881600/1728000 (same as 5 but with lower CPU freqs)
 
-Default: `cpu_gpu_limit=4`
+Default: `cpu_gpu_limit=3`
 
 Recommendations based on scenario:
 
 - Levels 1 and 2 are not recommended.
-- **Average day to day usage**: 3 or 4
-- Navigation: 4 (low cpu values!)
+- **Average day to day usage**: 3
+- Navigation/Android Auto: 4 or 3
 - Long time gaming ONLY: 6 or 5 (the higher GPU limit the better)
 
 NOTE: set value back from 5 or 6 to something lower after gaming as far as the driver will disable GPU limit completely in apps like camera!
