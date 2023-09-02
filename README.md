@@ -7,6 +7,10 @@ With max power limit temperature remains below 50(C) degrees and stability is mo
 Tested on Xiaomi 12 Pro Global, Android 13, Xiaomi.eu 14.0.14.0
 
 Confirmed to be working on Xiaomi 12, Xiaomi 12 Pro.
+<details> 
+  <summary>3DMark Stress Test 20 minutes</summary>
+  <img src="docs/3dMark-stress-test-20-minutes.jpg">
+</details>
 
 ## Setup
 
