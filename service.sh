@@ -73,12 +73,12 @@ write_config()
     echo "# no whitespaces allowed! Do not change anything else including comments!" > ${CONFIG_PATH}
     echo "" >> ${CONFIG_PATH}
     echo "# 0 - Disable limit completely" >> ${CONFIG_PATH}
-    echo "# 1 - Low GPU limit. CPU 1075200/1881600/1728000 (device is a bit less hot)" >> ${CONFIG_PATH}
-    echo "# 2 - Low GPU limit. CPU 1075200/1324800/1171200 (same as 1 but with lower CPU freqs)" >> ${CONFIG_PATH}
-    echo "# 3 - Average GPU limit. CPU 1075200/1881600/1728000 [Recommended] (device is less hot)" >> ${CONFIG_PATH}
-    echo "# 4 - Average GPU limit. CPU 1075200/1324800/1171200 [Recommended] (same as 3 but with lower CPU freqs)" >> ${CONFIG_PATH}
-    echo "# 5 - High GPU limit. CPU 1075200/1881600/1728000 (device is not hot)" >> ${CONFIG_PATH}
-    echo "# 6 - High GPU limit. CPU 1075200/1881600/1728000 (same as 5 but with lower CPU freqs)" >> ${CONFIG_PATH}
+    echo "# 1 - Low GPU limit (6). CPU 1075200/1881600/1728000" >> ${CONFIG_PATH}
+    echo "# 2 - Low GPU limit (6). CPU 1075200/1324800/1171200" >> ${CONFIG_PATH}
+    echo "# 3 - Average GPU limit (7). CPU 1075200/1881600/1728000 [Recommended]" >> ${CONFIG_PATH}
+    echo "# 4 - Average GPU limit (7). CPU 1075200/1324800/1171200" >> ${CONFIG_PATH}
+    echo "# 5 - High GPU limit (8). CPU 1075200/1881600/1728000" >> ${CONFIG_PATH}
+    echo "# 6 - High GPU limit (8). CPU 1075200/1881600/1728000" >> ${CONFIG_PATH}
     echo "" >> ${CONFIG_PATH}
     echo "cpu_gpu_limit=${LIMIT_PROFILE}" >> ${CONFIG_PATH}
     echo "" >> ${CONFIG_PATH}
@@ -93,7 +93,7 @@ write_config()
     echo "policy7_scaling_max_freq=${OVERRIDE_POLICY_7_SCALING_MAX_FREQ}" >> ${CONFIG_PATH}
     echo "" >> ${CONFIG_PATH}
     echo "# Set to true to enable verbose logging" >> ${CONFIG_PATH}
-    echo "enable_log=" >> ${CONFIG_PATH}
+    echo "enable_log=${ENABLE_LOG}" >> ${CONFIG_PATH}
     echo "" >> ${CONFIG_PATH}
 }
 write_config;
@@ -133,6 +133,7 @@ while true; do
     OVERRIDE_POLICY_0_SCALING_MAX_FREQ=$(grep "policy0_scaling_max_freq" ${CONFIG_PATH} | cut -d "=" -f2)
     OVERRIDE_POLICY_4_SCALING_MAX_FREQ=$(grep "policy4_scaling_max_freq" ${CONFIG_PATH} | cut -d "=" -f2)
     OVERRIDE_POLICY_7_SCALING_MAX_FREQ=$(grep "policy7_scaling_max_freq" ${CONFIG_PATH} | cut -d "=" -f2)
+    ENABLE_LOG=$(grep "enable_log" ${CONFIG_PATH} | cut -d "=" -f2)
 
     # reading current system values
     GPU_POWER_LIMIT_TMP=$(cat "${GPU_PATH}")
