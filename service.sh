@@ -192,10 +192,6 @@ while true; do
         POLICY_7_MAX_FREQ=${OVERRIDE_POLICY_7_SCALING_MAX_FREQ}
     fi
 
-    if [ "${LIMIT_PROFILE_PREV}" != "${LIMIT_PROFILE}" ] ; then
-        echo "perf-limit: applying new values:" >> ${LOG_FILE}
-    fi
-
     # writing new values if needed
     if [ "${GPU_POWER_LIMIT_TMP}" != "${GPU_POWER_LIMIT}" ] ; then
         if [ "${ENABLE_LOG}" == "true" ] || [ "${LIMIT_PROFILE_PREV}" != "${LIMIT_PROFILE}" ] || [ -n "${OVERRIDE_GPU_POWER_LIMIT}" ] ; then
