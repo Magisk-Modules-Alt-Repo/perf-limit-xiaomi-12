@@ -121,7 +121,7 @@ echo "perf-limit: perf-limit service is running..." >> ${LOG_FILE}
 
 LIMIT_PROFILE_PREV=initial
 
-while true; do
+main_fn() {
     # read config value
     if [ ! -f "${CONFIG_PATH}" ] ; then
         echo "perf-limit: Config was deleted! Writing your config to $CONFIG_PATH" >> ${LOG_FILE}
@@ -219,6 +219,17 @@ while true; do
     fi
     
     LIMIT_PROFILE_PREV="${LIMIT_PROFILE}"
+}
 
+main_fn;
+
+while true; do
     sleep 20
+
+    mWakefulness=$(dumpsys power | grep mWakefulness= | head -1 | cut -d "=" -f2)
+    if [ "${mWakefulness}" == "Dozing" ] || [ "${mWakefulness}" == "Asleep" ] ; then
+        continue
+    fi
+
+    main_fn;
 done
