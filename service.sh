@@ -48,15 +48,22 @@ else
     exit
 fi;
 
+read_config()
+{
+    CONFIG_CONTENT=$(cat ${CONFIG_PATH})
+
+    LIMIT_PROFILE=$(echo "${CONFIG_CONTENT}" | grep "cpu_gpu_limit" | cut -d "=" -f2)
+    OVERRIDE_GPU_POWER_LIMIT=$(echo "${CONFIG_CONTENT}" | grep "max_pwrlevel" | cut -d "=" -f2)
+    OVERRIDE_POLICY_0_SCALING_MAX_FREQ=$(echo "${CONFIG_CONTENT}" | grep "policy0_scaling_max_freq" | cut -d "=" -f2)
+    OVERRIDE_POLICY_4_SCALING_MAX_FREQ=$(echo "${CONFIG_CONTENT}" | grep "policy4_scaling_max_freq" | cut -d "=" -f2)
+    OVERRIDE_POLICY_7_SCALING_MAX_FREQ=$(echo "${CONFIG_CONTENT}" | grep "policy7_scaling_max_freq" | cut -d "=" -f2)
+    ENABLE_LOG=$(echo "${CONFIG_CONTENT}" | grep "enable_log" | cut -d "=" -f2)
+}
+
 # create config
 if [ -f "${CONFIG_PATH}" ] ; then
-    LIMIT_PROFILE=$(grep "cpu_gpu_limit" ${CONFIG_PATH} | cut -d "=" -f2)
-    OVERRIDE_GPU_POWER_LIMIT=$(grep "max_pwrlevel" ${CONFIG_PATH} | cut -d "=" -f2)
-    OVERRIDE_POLICY_0_SCALING_MAX_FREQ=$(grep "policy0_scaling_max_freq" ${CONFIG_PATH} | cut -d "=" -f2)
-    OVERRIDE_POLICY_4_SCALING_MAX_FREQ=$(grep "policy4_scaling_max_freq" ${CONFIG_PATH} | cut -d "=" -f2)
-    OVERRIDE_POLICY_7_SCALING_MAX_FREQ=$(grep "policy7_scaling_max_freq" ${CONFIG_PATH} | cut -d "=" -f2)
-    ENABLE_LOG=$(grep "enable_log" ${CONFIG_PATH} | cut -d "=" -f2)
     echo "perf-limit: using existing config ${CONFIG_PATH}" >> ${LOG_FILE}
+    read_config;
 
     # profile 7 removed in v2! Left it for compatibility with v1
     if [ "${LIMIT_PROFILE}" == "7" ] ; then
@@ -119,7 +126,7 @@ echo "perf-limit: current policy 7 value is '${POLICY_7_MAX_FREQ_ORIG}'" >> ${LO
 
 echo "perf-limit: perf-limit service is running..." >> ${LOG_FILE}
 
-LIMIT_PROFILE_PREV=initial
+CONFIG_CONTENT_PREV=initial
 
 main_fn() {
     # read config value
@@ -127,13 +134,7 @@ main_fn() {
         echo "perf-limit: Config was deleted! Writing your config to $CONFIG_PATH" >> ${LOG_FILE}
         write_config;
     fi;
-
-    LIMIT_PROFILE=$(grep "cpu_gpu_limit" ${CONFIG_PATH} | cut -d "=" -f2)
-    OVERRIDE_GPU_POWER_LIMIT=$(grep "max_pwrlevel" ${CONFIG_PATH} | cut -d "=" -f2)
-    OVERRIDE_POLICY_0_SCALING_MAX_FREQ=$(grep "policy0_scaling_max_freq" ${CONFIG_PATH} | cut -d "=" -f2)
-    OVERRIDE_POLICY_4_SCALING_MAX_FREQ=$(grep "policy4_scaling_max_freq" ${CONFIG_PATH} | cut -d "=" -f2)
-    OVERRIDE_POLICY_7_SCALING_MAX_FREQ=$(grep "policy7_scaling_max_freq" ${CONFIG_PATH} | cut -d "=" -f2)
-    ENABLE_LOG=$(grep "enable_log" ${CONFIG_PATH} | cut -d "=" -f2)
+    read_config;
 
     # reading current system values
     GPU_POWER_LIMIT_TMP=$(cat "${GPU_PATH}")
@@ -192,33 +193,53 @@ main_fn() {
         POLICY_7_MAX_FREQ=${OVERRIDE_POLICY_7_SCALING_MAX_FREQ}
     fi
 
-    # writing new values if needed
-    if [ "${GPU_POWER_LIMIT_TMP}" != "${GPU_POWER_LIMIT}" ] ; then
-        if [ "${ENABLE_LOG}" == "true" ] || [ "${LIMIT_PROFILE_PREV}" != "${LIMIT_PROFILE}" ] || [ -n "${OVERRIDE_GPU_POWER_LIMIT}" ] ; then
+    if [ "${CONFIG_CONTENT_PREV}" != "${CONFIG_CONTENT}" ] ; then
+        # writing new values as far as the config has changed
+        if [ "${GPU_POWER_LIMIT_TMP}" != "${GPU_POWER_LIMIT}" ] ; then
             echo "perf-limit: updating kgsl gpu from '${GPU_POWER_LIMIT_TMP}' to '${GPU_POWER_LIMIT}'" >> ${LOG_FILE}
+            echo "${GPU_POWER_LIMIT}" > ${GPU_PATH}
         fi
-        echo "${GPU_POWER_LIMIT}" > ${GPU_PATH}
-    fi
-    if [ "${POLICY_0_MAX_FREQ_TMP}" != "${POLICY_0_MAX_FREQ}" ] ; then
-        if [ "${ENABLE_LOG}" == "true" ] || [ "${LIMIT_PROFILE_PREV}" != "${LIMIT_PROFILE}" ] || [ -n "${OVERRIDE_POLICY_0_SCALING_MAX_FREQ}" ] ; then
+        if [ "${POLICY_0_MAX_FREQ_TMP}" != "${POLICY_0_MAX_FREQ}" ] ; then
             echo "perf-limit: updating policy 0 from '${POLICY_0_MAX_FREQ_TMP}' to '${POLICY_0_MAX_FREQ}'" >> ${LOG_FILE}
+            echo "${POLICY_0_MAX_FREQ}" > ${POLICY_0_PATH}
         fi
-        echo "${POLICY_0_MAX_FREQ}" > ${POLICY_0_PATH}
-    fi
-    if [ "${POLICY_4_MAX_FREQ_TMP}" != "${POLICY_4_MAX_FREQ}" ] ; then
-        if [ "${ENABLE_LOG}" == "true" ] || [ "${LIMIT_PROFILE_PREV}" != "${LIMIT_PROFILE}" ] || [ -n "${OVERRIDE_POLICY_4_SCALING_MAX_FREQ}" ] ; then
+        if [ "${POLICY_4_MAX_FREQ_TMP}" != "${POLICY_4_MAX_FREQ}" ] ; then
             echo "perf-limit: updating policy 4 from '${POLICY_4_MAX_FREQ_TMP}' to '${POLICY_4_MAX_FREQ}'" >> ${LOG_FILE}
+            echo "${POLICY_4_MAX_FREQ}" > ${POLICY_4_PATH}
         fi
-        echo "${POLICY_4_MAX_FREQ}" > ${POLICY_4_PATH}
-    fi
-    if [ "${POLICY_7_MAX_FREQ_TMP}" != "${POLICY_7_MAX_FREQ}" ] ; then
-        if [ "${ENABLE_LOG}" == "true" ] || [ "${LIMIT_PROFILE_PREV}" != "${LIMIT_PROFILE}" ] || [ -n "${OVERRIDE_POLICY_7_SCALING_MAX_FREQ}" ] ; then
+        if [ "${POLICY_7_MAX_FREQ_TMP}" != "${POLICY_7_MAX_FREQ}" ] ; then
             echo "perf-limit: updating policy 7 from '${POLICY_7_MAX_FREQ_TMP}' to '${POLICY_7_MAX_FREQ}'" >> ${LOG_FILE}
+            echo "${POLICY_7_MAX_FREQ}" > ${POLICY_7_PATH}
         fi
-        echo "${POLICY_7_MAX_FREQ}" > ${POLICY_7_PATH}
-    fi
+    else
+        # writing new values only if current limit is higher than the desired limit
+        if [ "${GPU_POWER_LIMIT_TMP}" -lt "${GPU_POWER_LIMIT}" ] ; then
+            if [ "${ENABLE_LOG}" == "true" ] ; then
+                echo "perf-limit: updating kgsl gpu from '${GPU_POWER_LIMIT_TMP}' to '${GPU_POWER_LIMIT}'" >> ${LOG_FILE}
+            fi
+            echo "${GPU_POWER_LIMIT}" > ${GPU_PATH}
+        fi
+        if [ "${POLICY_0_MAX_FREQ_TMP}" -gt "${POLICY_0_MAX_FREQ}" ] ; then
+            if [ "${ENABLE_LOG}" == "true" ] ; then
+                echo "perf-limit: updating policy 0 from '${POLICY_0_MAX_FREQ_TMP}' to '${POLICY_0_MAX_FREQ}'" >> ${LOG_FILE}
+            fi
+            echo "${POLICY_0_MAX_FREQ}" > ${POLICY_0_PATH}
+        fi
+        if [ "${POLICY_4_MAX_FREQ_TMP}" -gt "${POLICY_4_MAX_FREQ}" ] ; then
+            if [ "${ENABLE_LOG}" == "true" ] ; then
+                echo "perf-limit: updating policy 4 from '${POLICY_4_MAX_FREQ_TMP}' to '${POLICY_4_MAX_FREQ}'" >> ${LOG_FILE}
+            fi
+            echo "${POLICY_4_MAX_FREQ}" > ${POLICY_4_PATH}
+        fi
+        if [ "${POLICY_7_MAX_FREQ_TMP}" -gt "${POLICY_7_MAX_FREQ}" ] ; then
+            if [ "${ENABLE_LOG}" == "true" ] ; then
+                echo "perf-limit: updating policy 7 from '${POLICY_7_MAX_FREQ_TMP}' to '${POLICY_7_MAX_FREQ}'" >> ${LOG_FILE}
+            fi
+            echo "${POLICY_7_MAX_FREQ}" > ${POLICY_7_PATH}
+        fi
+    fi;
     
-    LIMIT_PROFILE_PREV="${LIMIT_PROFILE}"
+    CONFIG_CONTENT_PREV="${CONFIG_CONTENT}"
 }
 
 main_fn;
@@ -226,6 +247,7 @@ main_fn;
 while true; do
     sleep 20
 
+    # do nothing if the device is sleeping
     mWakefulness=$(dumpsys power | grep mWakefulness= | head -1 | cut -d "=" -f2)
     if [ "${mWakefulness}" == "Dozing" ] || [ "${mWakefulness}" == "Asleep" ] ; then
         continue
